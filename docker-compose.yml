@@ -5,45 +5,45 @@ services:
     image: postgres:15
     container_name: postgres_container
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}  # Set the PostgreSQL username
+      - POSTGRES_PASSWORD=${DB_PASSWORD}  # Set the PostgreSQL password
+      - POSTGRES_DB=${DB_NAME}  # Set the PostgreSQL database name
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - ./pgdata:/var/lib/postgresql/data  # Mount a volume for persistent data storage
     ports:
-      - '5432:5432'
+      - '5432:5432'  # Expose the PostgreSQL port
     networks:
-      - billing-app
+      - billing-app  # Connect to the billing-app network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]  # Perform a health check using pg_isready command
+      interval: 30s  # Health check interval
+      timeout: 10s  # Health check timeout
+      retries: 5  # Number of health check retries
 
   app:
     container_name: billapp_container
     build:
       context: .
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
-      - DATABASE_HOST=${DB_HOST}
+      - POSTGRES_USER=${DB_USER}  # Set the PostgreSQL username for the app
+      - POSTGRES_PASSWORD=${DB_PASSWORD}  # Set the PostgreSQL password for the app
+      - POSTGRES_DB=${DB_NAME}  # Set the PostgreSQL database name for the app
+      - DATABASE_HOST=${DB_HOST}  # Set the host for the app
     volumes:
-      - ./appdata:/app/data
+      - ./appdata:/app/data  # Mount a volume for persistent app data storage
     ports:
-      - 8070:8070
-    restart: on-failure
+      - 8070:8070  # Expose the app port
+    restart: on-failure  # Restart the app container on failure
     depends_on:
-      - pg
+      - pg  # Depend on the pg service
     networks:
-      - billing-app
+      - billing-app  # Connect to the billing-app network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8070/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+      test: ["CMD", "curl", "-f", "http://localhost:8070/health"]  # Perform a health check using curl command
+      interval: 30s  # Health check interval
+      timeout: 10s  # Health check timeout
+      retries: 5  # Number of health check retries
 
 networks:
   billing-app:
-    driver: bridge
+    driver: bridge  # Use the bridge network driver for the billing-app network
